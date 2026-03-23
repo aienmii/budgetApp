@@ -1,9 +1,19 @@
 package pk.ni.pasir_anastasiia_bohatyr.model;
 
+
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "transactions")
 public class Transaction {
 
@@ -21,73 +31,4 @@ public class Transaction {
     private String notes;
 
     private LocalDateTime timestamp;
-
-    // -------------------------
-    // GETTERY
-    // -------------------------
-
-    public Long getId() {
-        return id;
-    }
-
-    public Double getAmount() {
-        return amount;
-    }
-
-    public TransactionType getType() {
-        return type;
-    }
-
-    public String getTags() {
-        return tags;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    // -------------------------
-    // SETTERY
-    // -------------------------
-
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
-
-    public void setType(TransactionType type) {
-        this.type = type;
-    }
-
-    public void setTags(String tags) {
-        this.tags = tags;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    // -------------------------
-    // KONSTRUKTORY
-    // -------------------------
-
-    // Konstruktor bezparametrowy
-    public Transaction() {
-    }
-
-    // Konstruktor z parametrami (bez id)
-    public Transaction(Double amount, TransactionType type, String tags, String notes, LocalDateTime timestamp) {
-        this.amount = amount;
-        this.type = type;
-        this.tags = tags;
-        this.notes = notes;
-        this.timestamp = timestamp;
-    }
 }
