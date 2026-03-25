@@ -1,6 +1,5 @@
 package pk.ni.pasir_anastasiia_bohatyr.model;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,4 +30,8 @@ public class Transaction {
     private String notes;
 
     private LocalDateTime timestamp;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }
