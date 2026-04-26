@@ -2,9 +2,11 @@ package pk.ni.pasir_anastasiia_bohatyr.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import pk.ni.pasir_anastasiia_bohatyr.dto.BalanceDTO;
 import pk.ni.pasir_anastasiia_bohatyr.model.User;
 import pk.ni.pasir_anastasiia_bohatyr.repository.TransactionRepository;
 import pk.ni.pasir_anastasiia_bohatyr.model.Transaction;
@@ -26,11 +28,11 @@ public class TransactionService {
         this.userRepository = userRepository;
     }
 
-    private User getCurrentUser() {
+    public User getCurrentUser() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || authentication.getName() == null) {
-            throw new AccessDeniedException("Użytkownik nie jest uwierzytelniony");
+            throw new AccessDeniedException("Brak uwierzytelnienia");
         }
 
         String email = authentication.getName();
@@ -55,17 +57,18 @@ public class TransactionService {
         return t;
     }
 
-    public Transaction createTransaction(TransactionDTO transactionDTO) {
-        Transaction transaction = new Transaction();
-        transaction.setAmount(transactionDTO.getAmount());
-        transaction.setType(TransactionType.valueOf(transactionDTO.getType()));
-        transaction.setTags(transactionDTO.getTags());
-        transaction.setNotes(transactionDTO.getNotes());
-        transaction.setTimestamp(LocalDateTime.now());
-        transaction.setUser(getCurrentUser());
 
-        return repo.save(transaction);
+    public Transaction createTransaction(TransactionDTO dto) {
+        Transaction t = new Transaction();
+        t.setAmount(dto.getAmount());
+        t.setType(TransactionType.valueOf(dto.getType()));
+        t.setTags(dto.getTags());
+        t.setNotes(dto.getNotes());
+        t.setTimestamp(LocalDateTime.now());
+        t.setUser(getCurrentUser());
+        return repo.save(t);
     }
+
 
     public Transaction updateTransaction(Long id, TransactionDTO transactionDTO) {
         Transaction transaction = repo.findById(id)
@@ -94,4 +97,24 @@ public class TransactionService {
         repo.delete(t);
     }
 
+    public BalanceDTO getUserBalance(User user) {
+
+        List<Transaction> userTransactions = repo.findByUser(user);
+
+        double income = userTransactions.stream()
+                .filter(t -> t.getType() == TransactionType.INCOME)
+                .mapToDouble(Transaction::getAmount)
+                .sum();
+
+        double expense = userTransactions.stream()
+                .filter(t -> t.getType() == TransactionType.EXPENSE)
+                .mapToDouble(Transaction::getAmount)
+                .sum();
+
+        return new BalanceDTO(income, expense, income - expense);
+    }
 }
+
+
+
+

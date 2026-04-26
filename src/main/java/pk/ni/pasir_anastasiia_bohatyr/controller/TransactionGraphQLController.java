@@ -6,8 +6,10 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
+import pk.ni.pasir_anastasiia_bohatyr.dto.BalanceDTO;
 import pk.ni.pasir_anastasiia_bohatyr.dto.TransactionDTO;
 import pk.ni.pasir_anastasiia_bohatyr.model.Transaction;
+import pk.ni.pasir_anastasiia_bohatyr.model.User;
 import pk.ni.pasir_anastasiia_bohatyr.service.TransactionService;
 
 import java.util.List;
@@ -42,5 +44,12 @@ public class TransactionGraphQLController {
         transactionService.deleteTransaction(id);
         return true;
     }
+    @QueryMapping
+    public BalanceDTO userBalance() {
+        User user = transactionService.getCurrentUser();
+        return transactionService.getUserBalance(user);
+    }
+
+
 
 }

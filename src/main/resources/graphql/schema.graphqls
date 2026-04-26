@@ -1,5 +1,6 @@
 type Query {
     transactions: [Transaction]
+    userBalance: BalanceDto
 }
 
 type Mutation {
@@ -23,4 +24,11 @@ type Transaction {
     tags: String
     notes: String
     timestamp: String
+}
+
+
+type BalanceDto {
+    totalIncome: Float!
+    totalExpense: Float!
+    balance: Float!
 }
