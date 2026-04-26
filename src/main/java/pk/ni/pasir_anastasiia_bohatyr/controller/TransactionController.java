@@ -1,6 +1,5 @@
 package pk.ni.pasir_anastasiia_bohatyr.controller;
 
-
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +9,6 @@ import pk.ni.pasir_anastasiia_bohatyr.model.Transaction;
 import pk.ni.pasir_anastasiia_bohatyr.dto.TransactionDTO;
 
 import java.util.List;
-;
 
 @RestController
 @RequestMapping("/api/transactions")

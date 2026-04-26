@@ -1,18 +1,22 @@
 package pk.ni.pasir_anastasiia_bohatyr.security;
 
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
 public class JwtUtil {
 
-    private final SecretKey key = Jwts.SIG.HS512.key().build();
+    private final SecretKey key = Keys.hmacShaKeyFor(
+            "supersecretkeysupersecretkeysupersecretkey".getBytes(StandardCharsets.UTF_8)
+    );
 
     public String generateToken(String email) {
-        Long expirationMs = 3600000L; // 1h
+        Long expirationMs = 3600000L;
         return Jwts.builder()
                 .subject(email)
                 .issuedAt(new Date())

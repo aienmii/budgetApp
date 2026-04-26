@@ -28,10 +28,13 @@ public class TransactionService {
 
     private User getCurrentUser() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
+
         if (authentication == null || authentication.getName() == null) {
             throw new AccessDeniedException("Użytkownik nie jest uwierzytelniony");
         }
+
         String email = authentication.getName();
+
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono zalogowanego użytkownika: " + email));
     }
@@ -90,4 +93,5 @@ public class TransactionService {
 
         repo.delete(t);
     }
+
 }

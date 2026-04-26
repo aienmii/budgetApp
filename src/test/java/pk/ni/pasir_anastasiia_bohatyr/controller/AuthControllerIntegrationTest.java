@@ -103,7 +103,6 @@ class AuthControllerIntegrationTest {
     void shouldLoginAndReturnJwtToken() throws Exception {
         String email = generateUniqueEmail();
 
-        // Najpierw zarejestruj użytkownika
         UserDTO userDTO = new UserDTO();
         userDTO.setUsername(TEST_USERNAME);
         userDTO.setEmail(email);
@@ -113,7 +112,6 @@ class AuthControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userDTO)));
 
-        // Teraz zaloguj
         LoginDto loginDto = new LoginDto();
         loginDto.setEmail(email);
         loginDto.setPassword(TEST_PASSWORD);
@@ -133,7 +131,6 @@ class AuthControllerIntegrationTest {
     void shouldReturn401WhenLoginWithWrongPassword() throws Exception {
         String email = generateUniqueEmail();
 
-        // Najpierw zarejestruj użytkownika
         UserDTO userDTO = new UserDTO();
         userDTO.setUsername(TEST_USERNAME);
         userDTO.setEmail(email);
@@ -143,7 +140,6 @@ class AuthControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userDTO)));
 
-        // Próba logowania z błędnym hasłem
         LoginDto loginDto = new LoginDto();
         loginDto.setEmail(email);
         loginDto.setPassword("WrongPassword");
@@ -236,10 +232,8 @@ class AuthControllerIntegrationTest {
 
         String jsonResponse = result.getResponse().getContentAsString();
 
-        // Sprawdź, czy hasło w odpowiedzi nie jest plain text
         assert !jsonResponse.contains(TEST_PASSWORD);
 
-        // Sprawdź, czy hasło zaczyna się od prefiksu BCrypt
         assert jsonResponse.contains("$2a$") || jsonResponse.contains("$2b$");
     }
 
@@ -249,7 +243,6 @@ class AuthControllerIntegrationTest {
     void jwtTokenShouldHaveValidStructure() throws Exception {
         String email = generateUniqueEmail();
 
-        // Rejestracja
         UserDTO userDTO = new UserDTO();
         userDTO.setUsername(TEST_USERNAME + "_jwt");
         userDTO.setEmail(email);
@@ -259,7 +252,7 @@ class AuthControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userDTO)));
 
-        // Logowanie
+
         LoginDto loginDto = new LoginDto();
         loginDto.setEmail(email);
         loginDto.setPassword(TEST_PASSWORD);
@@ -272,7 +265,6 @@ class AuthControllerIntegrationTest {
 
         String jsonResponse = result.getResponse().getContentAsString();
 
-        // JWT powinien mieć 3 części oddzielone kropkami
         String token = jsonResponse.substring(jsonResponse.indexOf("\"token\":\"") + 9, jsonResponse.lastIndexOf("\""));
         String[] parts = token.split("\\.");
 
@@ -283,10 +275,8 @@ class AuthControllerIntegrationTest {
     @Order(10)
     @DisplayName("Powinien zwrócić 409 przy próbie rejestracji użytkownika z istniejącym emailem")
     void shouldReturn409WhenRegisterWithDuplicateEmail() throws Exception {
-        // Użyj unikalnego emaila dla tego testu, aby uniknąć konfliktów z poprzednimi uruchomieniami
         String duplicateEmail = generateUniqueEmail();
 
-        //Pierwsza rejestracja - powinna się udać
         UserDTO firstUser = new UserDTO();
         firstUser.setUsername("first_user");
         firstUser.setEmail(duplicateEmail);
@@ -299,10 +289,9 @@ class AuthControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value(duplicateEmail));
 
-        // Druga rejestracja z tym samym emailem - powinna zwrócić 409 CONFLICT
         UserDTO secondUser = new UserDTO();
         secondUser.setUsername("second_user");
-        secondUser.setEmail(duplicateEmail); // Ten sam email co pierwszy użytkownik
+        secondUser.setEmail(duplicateEmail);
         secondUser.setPassword("SecondPassword456");
 
         mockMvc.perform(post("/api/auth/register")
@@ -316,7 +305,6 @@ class AuthControllerIntegrationTest {
 
     @AfterEach
     void tearDown() {
-        // Opcjonalne czyszczenie po testach
     }
 }
 
