@@ -3,10 +3,11 @@ type Query {
 }
 
 type Mutation {
-    addTransaction(input: TransactionInput!): Transaction
-    updateTransaction(id: ID!, input: TransactionInput!): Transaction
+    addTransaction(transactionDTO: TransactionInput!): Transaction
+    updateTransaction(id: ID!, transactionDTO: TransactionInput!): Transaction
     deleteTransaction(id: ID!): Boolean
 }
+
 
 input TransactionInput {
     amount: Float!

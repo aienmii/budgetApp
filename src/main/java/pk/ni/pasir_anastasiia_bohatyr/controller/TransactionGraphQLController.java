@@ -27,15 +27,14 @@ public class TransactionGraphQLController {
     }
 
     @MutationMapping
-    public Transaction addTransaction(@Argument("input") @Valid TransactionDTO input) {
-        return transactionService.createTransaction(input);
+    public Transaction addTransaction(@Valid @Argument TransactionDTO transactionDTO) {
+        return transactionService.createTransaction(transactionDTO);
     }
 
     @MutationMapping
-    public Transaction updateTransaction(
-            @Argument Long id,
-            @Argument("input") @Valid TransactionDTO input) {
-        return transactionService.updateTransaction(id, input);
+    public Transaction updateTransaction(@Argument Long id,
+                                         @Valid @Argument TransactionDTO transactionDTO) {
+        return transactionService.updateTransaction(id, transactionDTO);
     }
 
     @MutationMapping
@@ -43,4 +42,5 @@ public class TransactionGraphQLController {
         transactionService.deleteTransaction(id);
         return true;
     }
+
 }
