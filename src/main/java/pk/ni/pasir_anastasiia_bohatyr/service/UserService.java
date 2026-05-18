@@ -46,6 +46,6 @@ public class UserService {
             throw new BadCredentialsException("Nieprawidłowe dane logowania");
         }
 
-        return jwtUtil.generateToken(user.getEmail());
+        return jwtUtil.generateToken(user);
     }
 }

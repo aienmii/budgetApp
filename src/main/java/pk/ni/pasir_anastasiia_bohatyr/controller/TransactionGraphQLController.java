@@ -45,10 +45,11 @@ public class TransactionGraphQLController {
         return true;
     }
     @QueryMapping
-    public BalanceDTO userBalance() {
+    public BalanceDTO userBalance(@Argument Float days) {
         User user = transactionService.getCurrentUser();
-        return transactionService.getUserBalance(user);
+        return transactionService.getUserBalance(user, days);
     }
+
 
 
 

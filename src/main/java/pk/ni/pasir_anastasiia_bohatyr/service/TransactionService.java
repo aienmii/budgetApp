@@ -97,9 +97,16 @@ public class TransactionService {
         repo.delete(t);
     }
 
-    public BalanceDTO getUserBalance(User user) {
+    public BalanceDTO getUserBalance(User user, Float days) {
 
-        List<Transaction> userTransactions = repo.findByUser(user);
+        List<Transaction> userTransactions;
+
+        if (days != null) {
+            LocalDateTime from = LocalDateTime.now().minusDays(days.longValue());
+            userTransactions = repo.findAllByUserAndTimestampGreaterThanEqual(user, from);
+        } else {
+            userTransactions = repo.findByUser(user);
+        }
 
         double income = userTransactions.stream()
                 .filter(t -> t.getType() == TransactionType.INCOME)
@@ -113,6 +120,8 @@ public class TransactionService {
 
         return new BalanceDTO(income, expense, income - expense);
     }
+
+
 }
 
 

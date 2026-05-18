@@ -1,12 +1,27 @@
 type Query {
     transactions: [Transaction]
-    userBalance: BalanceDto
+    userBalance(days: Float): BalanceDto
+    groups: [Group!]!
+    myGroups: [Group]
+
+    groupMembers(groupId: ID!): [Membership!]!
+    groupDebts(groupId: ID!): [Debt!]!
 }
 
 type Mutation {
     addTransaction(transactionDTO: TransactionInput!): Transaction
     updateTransaction(id: ID!, transactionDTO: TransactionInput!): Transaction
     deleteTransaction(id: ID!): Boolean
+    createGroup(groupDTO: GroupInput!): Group!
+    deleteGroup(id: ID!): Boolean!
+
+    addMember(membershipDTO: MembershipInput!): Membership!
+    removeMember(membershipId: ID!): Boolean!
+
+    createDebt(debtDTO: DebtInput!): Debt!
+    deleteDebt(debtId: ID!): Boolean!
+
+    addGroupTransaction(groupTransactionDTO: GroupTransactionInput!): Boolean
 }
 
 
@@ -27,8 +42,58 @@ type Transaction {
 }
 
 
+
+
+type User {
+    id: ID!
+    email: String!
+    username: String!
+}
+
+type Group {
+    id: ID!
+    name: String!
+    ownerId: ID!
+}
+
+input GroupInput {
+    name: String!
+}
+input GroupTransactionInput {
+    groupId: ID!
+    amount: Float!
+    type: String!
+    title: String!
+}
 type BalanceDto {
     totalIncome: Float!
     totalExpense: Float!
     balance: Float!
+}
+type Membership {
+    id: ID!
+    groupId: ID!
+    userId: ID!
+    userEmail: String!
+}
+
+input MembershipInput {
+    userEmail: String!
+    groupId: ID!
+}
+type Debt {
+id: ID!
+amount: Float!
+title: String!
+debtor: User!
+creditor: User!
+group: Group!
+}
+
+input DebtInput {
+debtorId: ID!
+creditorId: ID!
+groupId: ID!
+amount: Float!
+title: String!
 }
