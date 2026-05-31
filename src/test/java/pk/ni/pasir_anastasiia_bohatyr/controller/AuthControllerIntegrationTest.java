@@ -303,6 +303,7 @@ class AuthControllerIntegrationTest {
                 .andExpect(jsonPath("$.error").value(containsString("już istnieje")));
     }
 
+
     @AfterEach
     void tearDown() {
     }

@@ -4,6 +4,7 @@ package pk.ni.pasir_anastasiia_bohatyr.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import pk.ni.pasir_anastasiia_bohatyr.model.User;
@@ -35,6 +36,7 @@ public class JwtUtil {
     }
 
     public String generateToken(User user) {
+        validateUser(user);
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", user.getId());
         claims.put("email", user.getEmail());
@@ -58,6 +60,12 @@ public class JwtUtil {
 
     public String extractUsername(String token) {
         return extractAllClaims(token).getSubject();
+    }
+
+    public void validateUser(User user) {
+        if (user == null || StringUtils.isBlank(user.getPassword()) || StringUtils.isBlank(user.getUsername())) {
+            throw new IllegalStateException("Invalid username or password");
+        }
     }
 
     public boolean validateToken(String token) {
