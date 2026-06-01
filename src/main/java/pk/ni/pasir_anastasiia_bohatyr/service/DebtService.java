@@ -5,6 +5,7 @@ package pk.ni.pasir_anastasiia_bohatyr.service;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import pk.ni.pasir_anastasiia_bohatyr.dto.DebtDTO;
+import pk.ni.pasir_anastasiia_bohatyr.dto.TransactionDTO;
 import pk.ni.pasir_anastasiia_bohatyr.model.Debt;
 import pk.ni.pasir_anastasiia_bohatyr.model.Group;
 import pk.ni.pasir_anastasiia_bohatyr.model.User;
@@ -23,19 +24,23 @@ public class DebtService {
     private final UserRepository userRepository;
     private final MembershipService membershipService;
     private final CurrentUserService currentUserService;
+    private final TransactionService transactionService;
+
 
     public DebtService(
             DebtRepository debtRepository,
             GroupRepository groupRepository,
             UserRepository userRepository,
             MembershipService membershipService,
-            CurrentUserService currentUserService
+            CurrentUserService currentUserService,
+            TransactionService transactionService
     ) {
         this.debtRepository = debtRepository;
         this.groupRepository = groupRepository;
         this.userRepository = userRepository;
         this.membershipService = membershipService;
         this.currentUserService = currentUserService;
+        this.transactionService = transactionService;
     }
 
     public List<Debt> getGroupDebts(Long groupId) throws AccessDeniedException {
@@ -94,6 +99,15 @@ public class DebtService {
 
         debtRepository.delete(debt);
     }
+    private Debt getDebtForCurrentGroupMember(Long debtId) throws AccessDeniedException {
+        Debt debt = debtRepository.findById(debtId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Nie znaleziono długu o ID " + debtId + "."));
+
+        membershipService.assertCurrentUserIsGroupMember(debt.getGroup().getId());
+        return debt;
+    }
+
 
     private void assertCurrentUserCanManageDebt(Group group, User debtor, User creditor, User currentUser) throws AccessDeniedException {
         boolean isGroupOwner = group.getOwner().getId().equals(currentUser.getId());
@@ -107,4 +121,40 @@ public class DebtService {
             );
         }
     }
+    public Debt markDebtAsPaid(Long debtId) throws AccessDeniedException {
+        Debt debt = getDebtForCurrentGroupMember(debtId);
+        User currentUser = currentUserService.getCurrentUser();
+
+        if (!debt.getDebtor().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("Tylko dłużnik może oznaczyć dług jako opłacony.");
+        }
+
+        debt.setPaidByDebtor(true);
+        debt.setConfirmedByCreditor(false);
+        return debtRepository.save(debt);
+    }
+    public Debt confirmDebtPayment(Long debtId) throws AccessDeniedException {
+
+        Debt debt = getDebtForCurrentGroupMember(debtId);
+        User currentUser = currentUserService.getCurrentUser();
+
+        if (!debt.getCreditor().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("Tylko wierzyciel może potwierdzić spłatę długu.");
+        }
+
+        if (!debt.isPaidByDebtor()) {
+            throw new IllegalStateException("Dług musi zostać najpierw oznaczony jako opłacony przez dłużnika.");
+        }
+        TransactionDTO t = new TransactionDTO();
+        t.setAmount(debt.getAmount());
+        t.setType("INCOME");
+        t.setTags("DEBT_PAYMENT");
+        t.setNotes("Spłata długu: " + debt.getTitle());
+        transactionService.createTransaction(t);
+
+        debt.setConfirmedByCreditor(true);
+        return debtRepository.save(debt);
+    }
+
+
 }

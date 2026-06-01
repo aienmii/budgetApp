@@ -22,6 +22,9 @@ type Mutation {
     deleteDebt(debtId: ID!): Boolean!
 
     addGroupTransaction(groupTransactionDTO: GroupTransactionInput!): Boolean
+    markDebtAsPaid(debtId: ID!): Debt!
+    confirmDebtPayment(debtId: ID!): Debt!
+
 }
 
 
@@ -62,9 +65,11 @@ input GroupInput {
 input GroupTransactionInput {
     groupId: ID!
     amount: Float!
-    type: String!
+    type: String! # "INCOME" or "EXPENSE"
     title: String!
+    selectedUserIds: [ID!]
 }
+
 type BalanceDto {
     totalIncome: Float!
     totalExpense: Float!
@@ -82,12 +87,14 @@ input MembershipInput {
     groupId: ID!
 }
 type Debt {
-id: ID!
-amount: Float!
-title: String!
-debtor: User!
-creditor: User!
-group: Group!
+    id: ID!
+    amount: Float!
+    title: String!
+    paidByDebtor: Boolean!
+    confirmedByCreditor: Boolean!
+    debtor: User!
+    creditor: User!
+    group: Group!
 }
 
 input DebtInput {

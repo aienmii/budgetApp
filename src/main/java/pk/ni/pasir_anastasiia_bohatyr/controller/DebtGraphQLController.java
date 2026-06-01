@@ -35,4 +35,5 @@ public class DebtGraphQLController {
         debtService.deleteDebt(debtId);
         return true;
     }
+
 }

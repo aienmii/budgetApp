@@ -4,6 +4,8 @@ import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class GroupTransactionDTO {
@@ -21,4 +23,6 @@ public class GroupTransactionDTO {
     @NotBlank(message = "Tytuł nie może być pusty")
     @Size(max = 100)
     private String title;
+    private List<Long> selectedUserIds;
+
 }

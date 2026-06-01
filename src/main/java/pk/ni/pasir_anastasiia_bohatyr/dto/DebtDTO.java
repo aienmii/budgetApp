@@ -24,4 +24,6 @@ public class DebtDTO {
     @NotBlank(message = "Tytuł nie może być pusty")
     @Size(max = 100, message = "Tytuł nie może przekraczać 100 znaków")
     private String title;
+
+
 }

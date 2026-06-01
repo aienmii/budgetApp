@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -35,4 +37,8 @@ public class Debt {
     @ManyToOne
     @JoinColumn(name = "group_id")
     private Group group;
+    private boolean paidByDebtor = false;
+    private boolean confirmedByCreditor = false;
+    private LocalDateTime createdAt;
+
 }
