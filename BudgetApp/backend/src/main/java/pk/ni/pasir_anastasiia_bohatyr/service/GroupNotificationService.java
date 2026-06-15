@@ -26,11 +26,8 @@ public class GroupNotificationService {
             Group group,
             User creator,
             User recipient,
-            String title,
-            double totalAmount,
-            double participantAmount
+            String title
     ) {
-
         NotificationDTO notification =
                 NotificationDTO.builder()
                         .type("GROUP_EXPENSE_ADDED")

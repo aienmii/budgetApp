@@ -1,6 +1,7 @@
 package pk.ni.pasir_anastasiia_bohatyr.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j; // Add this import
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -10,8 +11,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component
 @Slf4j
+@Component
 public class GroupNotificationWebSocketHandler extends TextWebSocketHandler {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -38,7 +39,7 @@ public class GroupNotificationWebSocketHandler extends TextWebSocketHandler {
                 .computeIfAbsent(email, k -> ConcurrentHashMap.newKeySet())
                 .add(session);
 
-        System.out.println("WS CONNECTED: " + email + " session=" + session.getId());
+        log.info("WS CONNECTED: {} session={}", email, session.getId());
     }
 
     @Override
@@ -59,10 +60,10 @@ public class GroupNotificationWebSocketHandler extends TextWebSocketHandler {
                 }
             }
 
-            System.out.println("WS DISCONNECTED: " + email);
+            log.info("WS DISCONNECTED: {}", email);
         }
 
-        System.out.println("WS CLOSED: " + status);
+        log.info("WS CLOSED: {}", status);
     }
 
     public void sendToUser(String email, Object payload) {
@@ -70,7 +71,7 @@ public class GroupNotificationWebSocketHandler extends TextWebSocketHandler {
         Set<WebSocketSession> sessions = sessionsByUser.get(email);
 
         if (sessions == null || sessions.isEmpty()) {
-            System.out.println("WS NO SESSIONS FOR USER: " + email);
+            log.warn("WS NO SESSIONS FOR USER: {}", email);
             return;
         }
 
@@ -84,11 +85,10 @@ public class GroupNotificationWebSocketHandler extends TextWebSocketHandler {
                 }
             }
 
-            System.out.println("WS SENT TO: " + email + " payload=" + json);
+            log.info("WS SENT TO: {} payload={}", email, json);
 
         } catch (Exception e) {
-            System.out.println("WS ERROR SERIALIZING MESSAGE");
-            e.printStackTrace();
+            log.error("WS ERROR SERIALIZING MESSAGE", e);
         }
     }
 }

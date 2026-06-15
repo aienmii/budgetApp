@@ -1,6 +1,5 @@
 package pk.ni.pasir_anastasiia_bohatyr.security;
 
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -11,6 +10,7 @@ import pk.ni.pasir_anastasiia_bohatyr.model.User;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,14 +38,19 @@ public class JwtUtil {
     public String generateToken(User user) {
         validateUser(user);
         Map<String, Object> claims = new HashMap<>();
+
         claims.put("id", user.getId());
         claims.put("email", user.getEmail());
+
+        // Use java.time.Instant for modern date/time calculations
+        Instant now = Instant.now();
+        Instant expiration = now.plusMillis(EXPIRATION_MS);
 
         return Jwts.builder()
                 .claims(claims)
                 .subject(user.getEmail())
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_MS))
+                .issuedAt(Date.from(now)) // Convert Instant to Date for JJWT
+                .expiration(Date.from(expiration)) // Convert Instant to Date for JJWT
                 .signWith(key, Jwts.SIG.HS512)
                 .compact();
     }

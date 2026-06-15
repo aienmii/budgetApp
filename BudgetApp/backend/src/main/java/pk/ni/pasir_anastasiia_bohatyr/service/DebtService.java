@@ -47,22 +47,25 @@ public class DebtService {
         membershipService.assertCurrentUserIsGroupMember(groupId);
         return debtRepository.findByGroupId(groupId);
     }
-
+    private static final String DOES_NOT_EXIST_MSG = " nie istnieje.";
     public Debt createDebt(DebtDTO debtDTO) throws AccessDeniedException {
 
         Group group = groupRepository.findById(debtDTO.getGroupId())
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Nie można utworzyć długu. Grupa o ID " + debtDTO.getGroupId() + " nie istnieje."
+                        "Nie można utworzyć długu. Grupa o ID " + debtDTO.getGroupId() + DOES_NOT_EXIST_MSG
+
                 ));
 
         User debtor = userRepository.findById(debtDTO.getDebtorId())
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Nie można utworzyć długu. Dłużnik o ID " + debtDTO.getDebtorId() + " nie istnieje."
+                        "Nie można utworzyć długu. Dłużnik o ID " + debtDTO.getDebtorId() + DOES_NOT_EXIST_MSG
+
                 ));
 
         User creditor = userRepository.findById(debtDTO.getCreditorId())
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Nie można utworzyć długu. Wierzyciel o ID " + debtDTO.getCreditorId() + " nie istnieje."
+                        "Nie można utworzyć długu. Wierzyciel o ID " + debtDTO.getCreditorId() + DOES_NOT_EXIST_MSG
+
                 ));
 
         membershipService.assertCurrentUserIsGroupMember(group.getId());
@@ -89,7 +92,7 @@ public class DebtService {
     public void deleteDebt(Long debtId) throws AccessDeniedException {
         Debt debt = debtRepository.findById(debtId)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        "Nie można usunąć długu. Dług o ID " + debtId + " nie istnieje."
+                        "Nie można usunąć długu. Dług o ID " + debtId + DOES_NOT_EXIST_MSG
                 ));
 
         membershipService.assertCurrentUserIsGroupMember(debt.getGroup().getId());
