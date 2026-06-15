@@ -35,6 +35,8 @@ jobs:
 
       - name: Trigger SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
+        with:
+          projectBaseDir: BudgetApp
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} # Reads the token you saved in GitHub Secrets earlier
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
