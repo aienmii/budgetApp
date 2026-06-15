@@ -27,8 +27,6 @@ public class GroupTransactionService {
     private final TransactionService transactionService;
     private final GroupNotificationService notificationService;
 
-
-
     public GroupTransactionService(
             GroupRepository groupRepository,
             MembershipRepository membershipRepository,
@@ -42,81 +40,119 @@ public class GroupTransactionService {
         this.debtRepository = debtRepository;
         this.membershipService = membershipService;
         this.transactionService = transactionService;
-    this.notificationService = notificationService;}
+        this.notificationService = notificationService;
+    }
 
-    public void addGroupTransaction(GroupTransactionDTO transactionDTO, User currentUser) throws AccessDeniedException {
+    public void addGroupTransaction(
+            GroupTransactionDTO transactionDTO,
+            User currentUser
+    ) throws AccessDeniedException {
+
         TransactionDTO t = new TransactionDTO();
         t.setAmount(transactionDTO.getAmount());
         t.setType("EXPENSE");
-        t.setTags(("GROUP_EXPENSE"));
+        t.setTags("GROUP_EXPENSE");
         t.setNotes("Wydatek grupowy: " + transactionDTO.getTitle());
+
         transactionService.createTransaction(t);
+
         Group group = groupRepository.findById(transactionDTO.getGroupId())
-                .orElseThrow(() -> new EntityNotFoundException("Nie znaleziono grupy"));
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Nie znaleziono grupy"));
 
         membershipService.assertCurrentUserIsGroupMember(group.getId());
 
-        List<Membership> members = membershipRepository.findByGroupId(group.getId());
-        List<Membership> selectedMembers = selectParticipants(transactionDTO, members, currentUser);
+        List<Membership> members =
+                membershipRepository.findByGroupId(group.getId());
+
+        List<Membership> selectedMembers =
+                selectParticipants(transactionDTO, members, currentUser);
 
         if (selectedMembers.isEmpty()) {
-            throw new IllegalStateException("Grupa nie ma członków, nie można dodać transakcji.");
+            throw new IllegalStateException(
+                    "Grupa nie ma członków, nie można dodać transakcji."
+            );
         }
 
-        double amountPerUser = transactionDTO.getAmount() / selectedMembers.size();
-        boolean expense = "EXPENSE".equals(transactionDTO.getType());
+        double amountPerUser =
+                transactionDTO.getAmount() / selectedMembers.size();
+
+        boolean expense =
+                "EXPENSE".equals(transactionDTO.getType());
 
         for (Membership member : selectedMembers) {
             User otherUser = member.getUser();
 
             if (!otherUser.getId().equals(currentUser.getId())) {
                 Debt debt = new Debt();
+
                 debt.setDebtor(expense ? otherUser : currentUser);
                 debt.setCreditor(expense ? currentUser : otherUser);
                 debt.setGroup(group);
                 debt.setAmount(amountPerUser);
                 debt.setTitle(transactionDTO.getTitle());
-                debt.setTitle(transactionDTO.getTitle());
+
                 debtRepository.save(debt);
 
-                notificationService.sendExpenseNotification(group, currentUser, otherUser, transactionDTO.getTitle());
+                notificationService.sendExpenseNotification(
+                        group,
+                        currentUser,
+                        otherUser,
+                        transactionDTO.getTitle()
+                );
             }
         }
     }
 
-
     private List<Membership> selectParticipants(
             GroupTransactionDTO transactionDTO,
             List<Membership> members,
-            User currentUser) {
+            User currentUser
+    ) {
 
-        List<Long> selectedUserIds = transactionDTO.getSelectedUserIds();
+        List<Long> selectedUserIds =
+                transactionDTO.getSelectedUserIds();
 
         if (selectedUserIds == null || selectedUserIds.isEmpty()) {
             return members;
         }
 
-        Set<Long> uniqueSelectedUserIds = new HashSet<>(selectedUserIds);
+        Set<Long> uniqueSelectedUserIds =
+                new HashSet<>(selectedUserIds);
 
         List<Membership> selectedMembers = members.stream()
-                .filter(m -> uniqueSelectedUserIds.contains(m.getUser().getId()))
+                .filter(m ->
+                        uniqueSelectedUserIds.contains(
+                                m.getUser().getId()
+                        )
+                )
                 .toList();
 
         if (selectedMembers.size() != uniqueSelectedUserIds.size()) {
-            throw new IllegalStateException("Wszyscy wybrani użytkownicy muszą być członkami grupy.");
+            throw new IllegalStateException(
+                    "Wszyscy wybrani użytkownicy muszą być członkami grupy."
+            );
         }
 
         boolean currentUserSelected = selectedMembers.stream()
-                .anyMatch(m -> m.getUser().getId().equals(currentUser.getId()));
+                .anyMatch(m ->
+                        m.getUser().getId().equals(currentUser.getId())
+                );
 
         if (!currentUserSelected) {
-            throw new IllegalStateException("Aktualny użytkownik musi być uczestnikiem transakcji.");
+            throw new IllegalStateException(
+                    "Aktualny użytkownik musi być uczestnikiem transakcji."
+            );
         }
 
         if (selectedMembers.size() < 2) {
-            throw new IllegalStateException("Transakcja grupowa wymaga co najmniej dwóch uczestników.");
+            throw new IllegalStateException(
+                    "Transakcja grupowa wymaga co najmniej dwóch uczestników."
+            );
         }
 
         return selectedMembers;
     }
+
+
 }
