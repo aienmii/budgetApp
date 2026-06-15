@@ -26,10 +26,9 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> register(@Valid @RequestBody UserDTO userDTO) {
+    public ResponseEntity<User> register(@Valid @RequestBody UserDTO userDTO) { // <--- Changed to User
         return ResponseEntity.ok(userService.register(userDTO));
     }
-
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@Valid @RequestBody LoginDto dto) {
         try {
