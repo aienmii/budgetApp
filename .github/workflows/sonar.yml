@@ -53,7 +53,7 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@<insert-full-40-character-SHA-here> # v5
+        uses: SonarSource/sonarqube-scan-action@2500896589ef8f7247069a56136f8dc177c27ccf
         with:
           projectBaseDir: BudgetApp
         env:
