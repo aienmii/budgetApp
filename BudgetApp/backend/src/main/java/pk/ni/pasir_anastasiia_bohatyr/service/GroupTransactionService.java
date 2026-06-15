@@ -76,9 +76,10 @@ public class GroupTransactionService {
                 debt.setGroup(group);
                 debt.setAmount(amountPerUser);
                 debt.setTitle(transactionDTO.getTitle());
+                debt.setTitle(transactionDTO.getTitle());
                 debtRepository.save(debt);
 
-                groupNotificationService.sendExpenseNotification(group, creator, recipient, title);                );
+                notificationService.sendExpenseNotification(group, currentUser, otherUser, transactionDTO.getTitle());
             }
         }
     }
