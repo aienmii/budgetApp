@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
+@Slf4j
 public class GroupNotificationWebSocketHandler extends TextWebSocketHandler {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -24,7 +25,7 @@ public class GroupNotificationWebSocketHandler extends TextWebSocketHandler {
         Principal user = (Principal) session.getAttributes().get("user");
 
         if (user == null) {
-            System.out.println("WS REJECTED: no user in attributes");
+            log.warn("WS REJECTED: no user in attributes");
             try {
                 session.close(CloseStatus.NOT_ACCEPTABLE.withReason("No user"));
             } catch (Exception ignored) {}
