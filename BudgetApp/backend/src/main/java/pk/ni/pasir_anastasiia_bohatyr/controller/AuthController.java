@@ -1,5 +1,5 @@
 package pk.ni.pasir_anastasiia_bohatyr.controller;
-
+import pk.ni.pasir_anastasiia_bohatyr.model.User;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
